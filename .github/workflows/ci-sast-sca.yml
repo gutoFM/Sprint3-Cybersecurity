@@ -1,51 +1,56 @@
 name: CI - SAST + SCA
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  sast-sca:
+  security-ci:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout código
+        uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install Semgrep
-        run: pip install semgrep
-
-      - name: Run Semgrep
-        run: semgrep --config=p/security --json --output semgrep-report.json ./src || true
-
-      - name: Upload Semgrep Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: semgrep-report
-          path: semgrep-report.json
-
-      - name: Setup .NET
+      - name: Instalar .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '9.0.x'
 
-      - name: Check vulnerable NuGet packages
-        run: dotnet list src/MyApp.csproj package --vulnerable --include-transitive > dotnet-vuln.txt || true
+      - name: Build da solução
+        run: dotnet build Sprint3-CSHARP/Sprint.sln --no-restore
 
-      - name: Upload NuGet vuln report
-        uses: actions/upload-artifact@v4
-        with:
-          name: dotnet-vuln
-          path: dotnet-vuln.txt
+      # ------------------------
+      # SAST - Semgrep
+      - name: Instalar Semgrep
+        run: pip install semgrep
 
-      - name: Run OWASP Dependency-Check
+      - name: Rodar análise SAST
         run: |
-          docker run --rm -v "$(pwd)":/src owasp/dependency-check:latest \
-            --project "MyApp" --scan /src --format HTML --out /src/ci/dependency-check
+          semgrep --config auto \
+                  --config ./ci/semgrep-rules/custom-rule.yml \
+                  Sprint3-CSHARP/ \
+                  --json > docs/sast-report.json
 
-      - name: Upload Dependency-Check report
-        uses: actions/upload-artifact@v4
+      # ------------------------
+      # SCA - Dependency Check
+      - name: Instalar Dependency-Check
+        run: |
+          curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.2/dependency-check-10.0.2-release.zip -o depcheck.zip
+          unzip depcheck.zip -d depcheck
+
+      - name: Rodar análise SCA
+        run: |
+          ./depcheck/dependency-check/bin/dependency-check.sh \
+            --project "Sprint3-CSHARP" \
+            --scan Sprint3-CSHARP/ \
+            --format "HTML" \
+            --out docs/sca-report.html
+
+      - name: Upload Relatórios (artefatos)
+        uses: actions/upload-artifact@v3
         with:
-          name: dependency-check-report
-          path: ci/dependency-check
+          name: security-reports
+          path: docs/

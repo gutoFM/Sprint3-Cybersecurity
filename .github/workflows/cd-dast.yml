@@ -1,38 +1,42 @@
-name: CD - DAST Scan
+name: CD - DAST
 
 on:
+  workflow_dispatch:   # Executa manualmente
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  dast:
+  security-cd:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Setup .NET
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '9.0.x'
 
-      - name: Build & Publish
-        run: dotnet publish src/MyApp.csproj -c Release -o ./publish
+      - name: Build da solução
+        run: dotnet build Sprint3-CSHARP/Sprint.sln --no-restore
 
-      - name: Run app in background
+      - name: Rodar API em background
+        run: dotnet run --project Sprint3-CSHARP/CandidatosApi/SprintApi.csproj &
+      
+      - name: Aguardar API iniciar
+        run: sleep 15
+
+      - name: Rodar OWASP ZAP
         run: |
-          nohup dotnet ./publish/MyApp.dll --urls "http://localhost:5000" & echo $! > app.pid
+          docker run --rm -v $(pwd)/docs:/zap/wrk/:rw \
+            owasp/zap2docker-stable zap-baseline.py \
+            -t http://localhost:5000 \
+            -r zap-report.html
+        working-directory: .
 
-      - name: Wait for app
-        run: |
-          for i in {1..30}; do curl -sSf http://localhost:5000 && break || sleep 2; done
-
-      - name: Run ZAP Baseline Scan
-        run: |
-          docker run --rm -v "$(pwd)":/zap/wrk:rw -t owasp/zap2docker-stable zap-baseline.py \
-            -t http://host.docker.internal:5000 -r zap-report.html || true
-
-      - name: Upload ZAP report
-        uses: actions/upload-artifact@v4
+      - name: Upload Relatório DAST
+        uses: actions/upload-artifact@v3
         with:
-          name: zap-report
-          path: zap-report.html
+          name: dast-report
+          path: docs/zap-report.html

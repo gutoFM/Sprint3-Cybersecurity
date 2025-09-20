@@ -1,0 +1,7 @@
+rules:
+  - id: no-console-sensitive
+    patterns:
+      - pattern: Console.WriteLine($X)
+    message: "Evite Console.WriteLine com dados sensíveis"
+    severity: WARNING
+    languages: [csharp]

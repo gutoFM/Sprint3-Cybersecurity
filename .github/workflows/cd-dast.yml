@@ -22,7 +22,7 @@ jobs:
         run: dotnet build Sprint3-CSHARP/CandidatosApi/SprintApi.csproj
 
       - name: Run API in background
-        run: dotnet run --project Sprint3-CSHARP/CandidatosApi/SprintApi.csproj --urls "http://0.0.0.0:5000" &
+        run: dotnet run --project Sprint3-CSHARP/CandidatosApi/SprintApi.csproj --urls "http://0.0.0.0:5000" --no-build &
       
       - name: Wait for API
         run: |

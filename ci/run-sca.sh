@@ -9,8 +9,9 @@ fi
 
 echo "Usando JAVA_HOME=$JAVA_HOME"
 
-./depcheck/dependency-check/bin/dependency-check.sh \
+# Rodar Dependency-Check via Docker
+docker run --rm -v $(pwd):/src owasp/dependency-check:latest \
   --project "Sprint3-CSHARP" \
-  --scan Sprint3-CSHARP/ \
-  --format "HTML" \
-  --out ./docs/sca-report.html
+  --scan /src/Sprint3-CSHARP \
+  --format HTML \
+  --out /src/docs/dependency-check-report.html

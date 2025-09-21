@@ -15,19 +15,28 @@ jobs:
       # 1. Checkout do código
       - name: Checkout código
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
+
+        # Com submódulos e histórico completo (necessário para algumas análises)
+      - name: Print working directory and tree
+        run: |
+          pwd
+          ls -la
+          echo "Directory tree:"
+          ls -la Sprint3-CSHARP || true
 
       # 2. Setup .NET (para garantir build da solução)
       - name: Instalar .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+      
+      # 2.1 Restore da solução (necessário para algumas análises)
+      - name: Restore
+        run: dotnet restore Sprint3-CSHARP/Sprint.sln
 
       # 3. Build da solução (necessário para algumas análises)
       - name: Build solution
-        run: dotnet build Sprint3-CSHARP/Sprint.sln --configuration Release
+        run: dotnet build Sprint3-CSHARP/Sprint.sln --configuration Release --no-restore
 
       # ------------------------
       # SAST - Semgrep

@@ -12,14 +12,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
+
+      - name: Print working dir and tree
+        run: |
+          pwd
+          ls -la
+          echo "----"
+          ls -la Sprint3-CSHARP || true
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore Sprint3-CSHARP/Sprint.sln
 
       - name: Build API
         run: dotnet build Sprint3-CSHARP/CandidatosApi/SprintApi.csproj
@@ -27,11 +34,11 @@ jobs:
       - name: Run API in background
         run: dotnet run --project Sprint3-CSHARP/CandidatosApi/SprintApi.csproj --urls "http://0.0.0.0:5000" --no-build &
       
-      - name: Wait for API
+      - name: Wait for 200 on /
         run: |
           for i in {1..30}; do
-            if curl -s http://localhost:5000/health >/dev/null; then
-              echo "API is up!"
+            if curl -fsS http://127.0.0.1:5000/ >/dev/null; then
+              echo "API is up"
               break
             fi
             sleep 2
@@ -49,3 +56,5 @@ jobs:
         with:
           name: dast-report
           path: docs/zap-report.html
+          if-no-files-found: error
+          retention-days: 7

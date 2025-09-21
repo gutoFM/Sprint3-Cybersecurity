@@ -32,7 +32,8 @@ jobs:
         run: dotnet build Sprint3-CSHARP/CandidatosApi/SprintApi.csproj
 
       - name: Run API in background
-        run: dotnet run --project Sprint3-CSHARP/CandidatosApi/SprintApi.csproj --urls "http://0.0.0.0:5000" --no-build &
+        run: dotnet run --project Sprint3-CSHARP/CandidatosApi/SprintApi.csproj --urls "http://0.0.0.0:5000" --no-build & echo $! > api_pid.txt
+        
       
       - name: Wait for 200 on /
         run: |
@@ -43,15 +44,23 @@ jobs:
             fi
             sleep 2
           done
+
+      - name: Prepare docs directory
+        run: |
+          mkdir -p docs
+          chmod 777 docs
           
       - name: Run OWASP ZAP Baseline Scan
         run: |
           docker pull zaproxy/zap-stable
           chmod 777 docs   # garante permissão para o container criar o relatório
           docker pull zaproxy/zap-stable
-          docker run --rm -v $(pwd)/docs:/zap/wrk/:rw zaproxy/zap-stable zap-baseline.py \
+          docker run --rm --network host -v $(pwd)/docs:/zap/wrk/:rw zaproxy/zap-stable zap-baseline.py \
             -t http://127.0.0.1:5000 \
             -r zap-report.html
+
+      - name: Kill API
+        run: kill $(cat api_pid.txt)
 
       - name: Upload reports
         uses: actions/upload-artifact@v4

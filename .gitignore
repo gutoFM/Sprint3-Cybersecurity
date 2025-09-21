@@ -1,0 +1,2 @@
+# Ignorar banco de dados pesado do dependency-check
+depcheck/dependency-check/data/odc.mv.db

@@ -1,0 +1,43 @@
+﻿@baseUrl = http://localhost:5074
+@controller = candidatos
+
+### 🟢 GET - Listar todos os candidatos
+GET {{baseUrl}}/api/{{controller}}
+Accept: application/json
+
+### 🔵 POST - Criar um novo candidato
+POST {{baseUrl}}/api/{{controller}}
+Content-Type: application/json
+{
+  "nome": "Maria Souza",
+  "partido": "Partido Verde",
+  "idade": 42
+}
+
+### 🔵 POST - Criar um novo candidato com id Existente
+POST {{baseUrl}}/api/{{controller}}
+Content-Type: application/json
+{
+  "id": "4f804007-d7a9-436f-9ca2-f56b2b0ea10b",
+  "nome": "Maria Souza",
+  "partido": "Partido Verde",
+  "idade": 42
+}
+
+### 🟡 GET - Obter candidato por ID
+GET {{baseUrl}}/api/{{controller}}/4f804007-d7a9-436f-9ca2-f56b2b0ea10b
+Accept: application/json
+
+### 🟠 PUT - Atualizar candidato por ID
+PUT {{baseUrl}}/api/{{controller}}
+Content-Type: application/json
+{
+  "id": "4f804007-d7a9-436f-9ca2-f56b2b0ea10b",
+  "nome": "Maria Souza Atualizada",
+  "partido": "Partido Amarelo",
+  "idade": 43
+}
+
+### 🔴 DELETE - Remover candidato por ID
+DELETE {{baseUrl}}/api/{{controller}}/4f804007-d7a9-436f-9ca2-f56b2b0ea10b
+Accept: application/json

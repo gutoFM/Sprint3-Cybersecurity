@@ -5,20 +5,24 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch: # Manual trigger - Executar manualmente na aba do Github "Actions"
 
 jobs:
-  security-ci:
+  sast-sca:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout do código
       - name: Checkout código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      # 2. Setup .NET (para garantir build da solução)
       - name: Instalar .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
+      # 3. Build da solução (necessário para algumas análises)
       - name: Build da solução
         run: dotnet build Sprint3-CSHARP/Sprint.sln --no-restore
 
@@ -41,16 +45,20 @@ jobs:
           curl -L https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.2/dependency-check-10.0.2-release.zip -o depcheck.zip
           unzip depcheck.zip -d depcheck
 
-      - name: Rodar análise SCA
+      # 5. Rodar SCA com OWASP Dependency-Check via Docker
+      - name: Run Dependency-Check (SCA)
         run: |
-          ./depcheck/dependency-check/bin/dependency-check.sh \
+          docker run --rm -v $(pwd):/src owasp/dependency-check:latest \
             --project "Sprint3-CSHARP" \
-            --scan Sprint3-CSHARP/ \
-            --format "HTML" \
-            --out docs/sca-report.html
+            --scan /src/Sprint3-CSHARP \
+            --format HTML \
+            --out /src/docs/dependency-check-report.html
 
-      - name: Upload Relatórios (artefatos)
-        uses: actions/upload-artifact@v3
+      # 6. Upload dos relatórios como artifact
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
         with:
-          name: security-reports
+          name: sast-sca-reports
           path: docs/
+          if-no-files-found: warn
+          retention-days: 7

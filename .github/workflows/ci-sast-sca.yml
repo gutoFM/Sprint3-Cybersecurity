@@ -23,8 +23,8 @@ jobs:
           dotnet-version: '9.0.x'
 
       # 3. Build da solução (necessário para algumas análises)
-      - name: Build da solução
-        run: dotnet build Sprint3-CSHARP/Sprint.sln --no-restore
+      - name: Build solution
+        run: dotnet build Sprint3-CSHARP/Sprint.sln --configuration Release
 
       # ------------------------
       # SAST - Semgrep
@@ -54,7 +54,7 @@ jobs:
             --format HTML \
             --out /src/docs/dependency-check-report.html
 
-      # 6. Upload dos relatórios como artifact
+      # 6. Upload dos relatórios como artefatos
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:

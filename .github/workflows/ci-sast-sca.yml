@@ -15,6 +15,9 @@ jobs:
       # 1. Checkout do código
       - name: Checkout código
         uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
 
       # 2. Setup .NET (para garantir build da solução)
       - name: Instalar .NET

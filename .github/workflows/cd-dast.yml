@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -33,7 +36,7 @@ jobs:
             fi
             sleep 2
           done
-
+          
       - name: Run OWASP ZAP Baseline Scan
         run: |
           docker pull zaproxy/zap-stable

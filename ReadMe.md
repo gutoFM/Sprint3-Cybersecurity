@@ -91,20 +91,24 @@ Sprint3-Cyber/
 ## Execução Local
 
 ### 1. SAST
-```bash
+```
+bash
 chmod +x ci/run-sast.sh
 ./ci/run-sast.sh
 Relatório gerado em docs/sast-report.json
-
+```
 ### 2. SCA
+```
 chmod +x ci/run-sca.sh
 ./ci/run-sca.sh
 Relatório gerado em docs/dependency-check-report.html
-
+```
 ### 3. DAST
+```
 chmod +x ci/run-dast.sh
 ./ci/run-dast.sh
 Relatório gerado em docs/zap-report.html
+```
 
 ---
 
@@ -118,16 +122,15 @@ Gera relatórios automatizados de vulnerabilidades e dependências.
 Executado em pipeline separado.
 Sobe a API em ambiente de staging e aplica o scan dinâmico com OWASP ZAP.
 
-⚠️ **Observação: Em ambiente GitHub Actions, a execução pode falhar devido a restrições de rede e permissões de containers. 
-No entanto, os relatórios foram gerados localmente e estão disponíveis no diretório docs/.
+### Observação: Em ambiente GitHub Actions, a execução pode falhar devido a restrições de rede e permissões de containers. No entanto, os relatórios foram gerados localmente e estão disponíveis no diretório docs/.
 
 ---
 
 ## Relatórios
 
-**docs/sast-report.json → Vulnerabilidades encontradas no código.
-**docs/dependency-check-report.html → Dependências e CVEs conhecidos.
-**docs/zap-report.html → Relatório de varredura dinâmica.
+**docs/sast-report.json → Vulnerabilidades encontradas no código.**
+**docs/dependency-check-report.html → Dependências e CVEs conhecidos.**
+**docs/zap-report.html → Relatório de varredura dinâmica.**
 
 ---
 

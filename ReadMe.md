@@ -6,7 +6,7 @@ Foram integradas ferramentas de **SAST, DAST e SCA** no pipeline, além da docum
 ---
 
 ## Estrutura do Projeto
-
+```
 Sprint3-Cyber/
 │
 ├── .github/
@@ -72,7 +72,7 @@ Sprint3-Cyber/
 │   └── Sprint.sln
 │
 └── README.txt
-
+```
 
 ## Ferramentas Utilizadas
 
